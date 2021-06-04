@@ -1,9 +1,5 @@
 package com.keepcall;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-
 public class Api_Push {
 
 	public static void main(String[] args) {
@@ -22,7 +18,6 @@ public class Api_Push {
 //		List<String> testrefId = Arrays.asList("621801","621851","621901","621951","622001");
 //		
 //		u.AddContactsInList(testList,testrefId);
-		
 //		
 //		String listId = "128";
 //		

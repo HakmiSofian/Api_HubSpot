@@ -34,20 +34,21 @@ public class PushFormJavaSwing {
 	/**
 	 * Create the application.
 	 */
-	public PushFormJavaSwing(String strhapikey,HashMap<String, List<String>> mapIdsString,String strPathTmpDonePostTask ) {
+	public PushFormJavaSwing(String strhapikey, String strPathTmpDonePostTask,String strPathTmpDoneImport ) {
 		File fileDonePost = new File(strPathTmpDonePostTask);
-		initialize(strhapikey,mapIdsString,fileDonePost);
+		initialize(strhapikey,fileDonePost,strPathTmpDoneImport);
 	}
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize(String strhapikey,HashMap<String, List<String>> mapIdsString, File fileDonePost ) {
+	private void initialize(String strhapikey,  File fileDonePost,String strPathTmpDoneImport ) {
 		frame = new JFrame();
         frame = new JFrame("Creation de Tache"); 
 		frame.setBounds(100, 100, 730, 489);
 		frame.getContentPane().setLayout(null);
 	
+		HashMap<String, List<String>> mapIdsString = Utility.getDataFromDoneFile(strPathTmpDoneImport);
 
 		// TITRE
 		JLabel lblName = new JLabel("Titre");
@@ -252,6 +253,8 @@ public class PushFormJavaSwing {
 			    	System.out.println("*************************************************************\n");
 				}
 				
+				Utility.DeleteFile(fileDonePost);
+				Utility.DeleteFile(new File(strPathTmpDoneImport));
 			}
 		});
 		

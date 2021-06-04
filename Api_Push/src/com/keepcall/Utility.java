@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.swing.JButton;
@@ -43,6 +42,7 @@ import org.w3c.dom.Document;
 
 public class Utility {
 
+	private static final int LIMIT_PUTTING_SIZE = 500;
 	private static String strurl ;
     private static String strdbuser ; 
     private static String strdbpassword ;
@@ -248,7 +248,6 @@ public class Utility {
                 			System.out.print( "Ajout des références dans la liste :" +fileChooser.getSelectedFile().getName());
                 			output = AddContactsInList(listId,MapIds );
                 			System.out.println(" ...........  SUCCESS\n\n");
-                			System.out.println(" ...........  SUCCESS\n\n");
                 			
                 			
 //                	        File fileTmpDone = new File(strPathTmpDoneImport);
@@ -268,8 +267,9 @@ public class Utility {
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                     	try {
-                			HashMap<String, List<String>> MapIds = getDataFromDoneFile(strPathTmpDoneImport);
-        					new PushFormJavaSwing(strhapikey,MapIds,strPathTmpDonePostTask);
+        					new PushFormJavaSwing(strhapikey,strPathTmpDonePostTask,strPathTmpDoneImport);
+//        					DeleteFile(new File(strPathTmpDoneImport));
+//        					DeleteFile(new File(strPathTmpDonePostTask));
         				} catch (Exception e1) {
         					e1.printStackTrace();
         				}
@@ -292,6 +292,7 @@ public class Utility {
 
 
 	protected static String AddContactsInList(String listId, HashMap<String, List<String>> mapIds) {
+		String output= "";
 		String request = "https://api.hubapi.com/contacts/v1/lists/"+ listId+"/add?hapikey="+strhapikey;
 		String body ="{\r\n" + 
 				"  \"vids\": [\r\n" + 
@@ -299,18 +300,25 @@ public class Utility {
 		int count=1;
         for(String i : mapIds.keySet() ) {
         	String refId = i;
-        	if(count == mapIds.size())
+
+        	if(count == mapIds.size() || count % (LIMIT_PUTTING_SIZE -1) ==0 ) {
         		body = body + refId ;
+                body.replace(body.substring(body.length()-2), "");
+                body = body + "\r\n" + 
+        				"  ]\r\n" + 
+        				"}";
+                
+                output = HubRequests.postRequest(request,body);
+                //reset body
+        		body ="{\r\n" + 
+        				"  \"vids\": [\r\n" + 
+        				"    " ;
+        	}
         	else
         		body = body + refId+",";
         	count++;
         }
-        body.replace(body.substring(body.length()-2), "");
-        body = body + "\r\n" + 
-				"  ]\r\n" + 
-				"}";
-        
-        String output = HubRequests.postRequest(request,body);
+
         return output;
 	}
 
@@ -435,9 +443,9 @@ public class Utility {
         	String refToBeImported = entry.getKey();
         	
         	List<String> lTels = entry.getValue();
-        	String tel1 = lTels.get(0);
-        	String tel2 = lTels.get(1);
-        	String tel3 = lTels.get(2);
+        	String tel1 = lTels.get(0).replaceAll("\\r", "").replaceAll("\\n", "");
+        	String tel2 = lTels.get(1).replaceAll("\\r", "").replaceAll("\\n", "");
+        	String tel3 = lTels.get(2).replaceAll("\\r", "").replaceAll("\\n", "");
                 
         	
         	
@@ -457,7 +465,6 @@ public class Utility {
 //			Write this reference in the done file
 			writeDone(tmpDone,contactId,refToBeImported,owners.get(count),tel1,tel2,tel3);
 		}
-//		DeleteFile(tmpDone);
 		
 		return refIds;
 	}
@@ -537,7 +544,7 @@ public class Utility {
 			return false;
 	}
 	
-	private static HashMap<String, List<String>> getDataFromDoneFile(String strPathTmpDoneImport) {
+	public static  HashMap<String, List<String>> getDataFromDoneFile(String strPathTmpDoneImport) {
 //		List<String> listRefIds = new ArrayList<String>();
 		HashMap<String, List<String>> listRefIds = new HashMap<String, List<String>>();
 
