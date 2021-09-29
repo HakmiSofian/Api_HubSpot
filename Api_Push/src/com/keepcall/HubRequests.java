@@ -49,6 +49,7 @@ public class HubRequests {
 			os.close();
 			reader.close();
 			//return output;
+			System.out.println("..................SUCCESS\n" );	
 
 		}catch (MalformedURLException e) {
 			// TODO Auto-generated catch block

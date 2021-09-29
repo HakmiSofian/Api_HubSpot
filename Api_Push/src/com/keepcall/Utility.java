@@ -385,7 +385,6 @@ public class Utility {
             	lTels.add(row.getCell(rankTel2).getStringCellValue());
             	lTels.add(row.getCell(rankTel3).getStringCellValue());
             	MapRefTel.put(row.getCell(rankRefCell).getStringCellValue(),lTels);
-
 //            	System.out.println("this ref is added : "+row.getCell(rankRefCell).getStringCellValue());
             }else {
 	            Iterator<Cell> cellIterator = row.cellIterator();
@@ -457,7 +456,6 @@ public class Utility {
 			System.out.print("Creatation de la référence : "+ refToBeImported );
 			String output= HubRequests.Push_ContactInHubspot(refToBeImported,owners.get(count),strhapikey);
 			String contactId = getContactId(output);
-			System.out.println(" ...........  SUCCESS");
 
 
 			

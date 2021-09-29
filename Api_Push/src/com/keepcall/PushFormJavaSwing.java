@@ -1,6 +1,7 @@
 package com.keepcall;
 
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,8 +18,12 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
+import javax.swing.JRootPane;
 
 import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
 import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
@@ -26,7 +31,7 @@ import net.sourceforge.jdatepicker.impl.UtilDateModel;
 
 public class PushFormJavaSwing {
 
-	private JFrame frame;
+//	private JFrame frame;
  
 
 	
@@ -43,13 +48,43 @@ public class PushFormJavaSwing {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize(String strhapikey,  File fileDonePost,String strPathTmpDoneImport ) {
-		frame = new JFrame();
+		JFrame frame = new JFrame();
         frame = new JFrame("Creation de Tache"); 
 		frame.setBounds(100, 100, 730, 489);
 		frame.getContentPane().setLayout(null);
 	
 		HashMap<String, List<String>> mapIdsString = Utility.getDataFromDoneFile(strPathTmpDoneImport);
 
+
+					
+					  
+//			        // create a frame 
+//			        JFrame f = new JFrame("Progression de Téléchargement"); 
+//			        // create a panel 
+//			        JPanel p = new JPanel(); 
+//			        // add progressbar
+//			        JButton btnGet = new JButton("Annuler");
+//			        btnGet.addActionListener(
+//			                new ActionListener() {
+//			                    public void actionPerformed(ActionEvent e) {
+//			                        System.out.println(new Date()+" : "+"Annulation de l'export.");
+//			                    	System.exit(0);
+//			                    }
+//			                });
+//			        
+//			        p.setLayout(new BorderLayout());
+//			        p.add(progressBar,BorderLayout.CENTER); 
+//			        p.add(btnGet,BorderLayout.SOUTH);
+//			        // add panel 
+//			        f.add(p); 
+//			        // set the size of the frame 
+//			        f.setSize(800, 300); 
+//			        f.setVisible(true); 
+			       
+					/**
+					 * Creation d'une barre de chargement.
+					 */      
+		
 		// TITRE
 		JLabel lblName = new JLabel("Titre");
 		lblName.setBounds(65, 31, 46, 14);
@@ -58,7 +93,10 @@ public class PushFormJavaSwing {
 		JComboBox<String> comboBoxtitre = new JComboBox<String>();
 		comboBoxtitre.addItem("PREMIER APPEL VOO");
 		comboBoxtitre.addItem("PREMIER APPEL RESA");
+		comboBoxtitre.addItem("PREMIER APPEL RESA BORDET");
 		comboBoxtitre.addItem("PREMIER APPEL CHC");
+		comboBoxtitre.addItem("DERNIERE RELANCE CHC");
+		
 		comboBoxtitre.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 			}
@@ -136,6 +174,22 @@ public class PushFormJavaSwing {
 		btnSubmit.setForeground(Color.MAGENTA);
 		btnSubmit.setBounds(65, 387, 89, 23);
 		frame.getContentPane().add(btnSubmit);
+
+		
+//		/**
+//		 * Creation d'une barre de chargement.
+//		 */
+//		
+//		JLabel lblProgression = new JLabel("Progression");
+//		lblProgression.setBounds(65, 220, 100, 14);
+//		frame.getContentPane().add(lblProgression);
+//		
+//		
+//		JProgressBar progressBar= new JProgressBar();
+//		progressBar.setValue(0); 
+//	    progressBar.setStringPainted(true); 
+//	    progressBar.setBounds(65, 250, 500, 100);
+//		frame.getContentPane().add(progressBar);
 		
 		
 		btnSubmit.addActionListener(new ActionListener() {
@@ -186,7 +240,9 @@ public class PushFormJavaSwing {
 					
 
 					String type = "TASK";
-					
+//					float x=mapIdsString.size();
+//		            float progression_One_Line = 100/x;  
+//		            x=0;
 							
 	//				if(textField.getText().isEmpty()||(textField_1.getText().isEmpty())||(textField_2.getText().isEmpty()))
 	//					JOptionPane.showMessageDialog(null, "Data Missing");
@@ -196,11 +252,18 @@ public class PushFormJavaSwing {
 			    	System.out.println("******************* PUSH TASKS START ************************");
 			    	System.out.println("*************************************************************\n");
 				    for (Map.Entry<String, List<String>> entry : mapIdsString.entrySet()) {
+				    	
+				        //Progress bar avancement
+//						x = (x+progression_One_Line);
+//						progressBar.setValue((int) x);
+
+						
 				    	String titre="";
 				    	String body="";
 				    	String contactId = entry.getValue().get(0);
 				    	String ref = entry.getValue().get(1);
 				    	String ownerId = entry.getValue().get(2);
+				    	String ownerAziz = "40861304";
 				    	String tel1 ="";
 				    	String tel2 ="";
 				    	String tel3 ="";
@@ -219,7 +282,9 @@ public class PushFormJavaSwing {
 		                if(tels.equals("")||tels.equals("#")) {
 		                	titre ="CCENTER/RECH "+receptionDate ;
 		                	body ="Pas de numero sur la fiche";	
-		            		status = "COMPLETED";
+//		            		status = "COMPLETED";
+		            		status = "NOT_STARTED";
+
 		                }
 		                else {
 		                	isNotRech=true;
@@ -235,17 +300,18 @@ public class PushFormJavaSwing {
 		                System.out.println("STATUS : "+status);
 		                System.out.println("Echance Date : "+ strdateWithoutTime+ " 08:00:00" );	
 		                
-		                if(Utility.searchIfDone(entry.getKey(), fileDonePost))continue;
+		                if(Utility.searchIfDone(ref, fileDonePost))continue;
 		                String output="";
 		                
-		                if(isNotRech)
+//		                if(isNotRech)
 		                 output= HubRequests.Post_Task( ownerId,longEcheanceDate,  type, contactId,
 								 body,  titre,  status, strhapikey) ;
-
-		                System.out.println("..................SUCCESS\n" );	
+//		                else 
+//		                	output= HubRequests.Post_Task( ownerAziz,longEcheanceDate,  type, contactId,
+//									 body,  titre,  status, strhapikey) ;
+		                
 		                
 		                Utility.writeDone(fileDonePost, contactId, ref, ownerId,tel1,tel2,tel3);
-//		                (File tmpDone, String contactId, String refToBeImported, String owner, String tel1, String tel2, String tel3) 
 
 				    }
 			    	System.out.println("*************************************************************");
@@ -268,4 +334,5 @@ public class PushFormJavaSwing {
 		});
 		frame.setVisible(true);
 	}
+
 }
